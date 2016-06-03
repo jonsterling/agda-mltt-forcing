@@ -1,0 +1,5 @@
+name: mltt-forcing
+include:
+  .
+  src
+  modules/agda-prelude/src
