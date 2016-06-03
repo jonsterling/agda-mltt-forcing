@@ -37,3 +37,13 @@ snoc-nope p k k′ k≠k′ with k Nat.≟ k′
 snoc-nope p k k′ k≠k′ | ⊕.inl x = refl
 snoc-nope p k .k k≠k′ | ⊕.inr refl with k≠k′ refl
 snoc-nope p k .k k≠k′ | ⊕.inr refl | ()
+
+#-snoc : ∀ {p l k i} → k # p → (l ≡ k → 𝟘) → k # (p ⌢ l ↝ i)
+#-snoc {p = p} {l = l} {k = k} {i = i} k#p k≠l rewrite snoc-nope p l k {i = i} k≠l = k#p
+
+_≈_ : Condition → Condition → Set
+p ≈ q = ∀ k → p k ≡ q k
+
+≈-refl : ∀ {p} → p ≈ p
+≈-refl i = refl
+

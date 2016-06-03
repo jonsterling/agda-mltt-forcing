@@ -27,6 +27,9 @@ data Exn (A : Set) : Set where
   ok_ : A → Exn A
   raise : Nat → Exn A
 
+raise-inj : ∀ {A : Set} {m n} → raise {A} m ≡ raise n → m ≡ n
+raise-inj refl = refl
+
 instance
   Exn-functor : Functor Exn
   Functor.map Exn-functor f (ok x) = ok (f x)
@@ -132,7 +135,6 @@ E ⇑ k = ⟨⟩ ⊩ E ⇑ k
 ⇑-lemma : ∀ {p E k} → p ⊩ E ⇑ k → k # p
 ⇑-lemma D = ⇒-raise-lemma D
 
-
 -- TODO: prove that evaluation is monotone wrt. forcing conditions
 ↦-mono
   : ∀ {p k i 𝓜 𝓝}
@@ -166,3 +168,32 @@ E ⇑ k = ⟨⟩ ⊩ E ⇑ k
   → k # p
   → (p ⌢ k ↝ i) ⊩ E ⇓ M
 ⇓-mono = ⇒-mono
+
+
+↦-raise-mono
+  : ∀ {p k l i 𝓜}
+  → p ⊩ 𝓜 ↦ raise l
+  → (k ≡ l → 𝟘)
+  → (p ⌢ k ↝ i) ⊩ 𝓜 ↦ raise l
+↦-raise-mono (cut () -•) k≠l
+↦-raise-mono (cut () π₁-) k≠l
+↦-raise-mono (cut () π₂-) k≠l
+↦-raise-mono (cut () (𝔣-ok x)) k≠l
+↦-raise-mono (cut refl (𝔣-raise m#p)) k≠l = cut refl (𝔣-raise (#-snoc m#p k≠l))
+
+⇒-raise-mono
+  : ∀ {p k l i 𝓜}
+  → p ⊩ 𝓜 ⇒ raise l
+  → k # p
+  → (k ≡ l → 𝟘)
+  → (p ⌢ k ↝ i) ⊩ 𝓜 ⇒ raise l
+⇒-raise-mono (raise D) k#p k≠l = raise (↦-raise-mono D k≠l)
+⇒-raise-mono (go D E) k#p k≠l = go (↦-mono D k#p) (⇒-raise-mono E k#p k≠l)
+
+⇑-mono
+  : ∀ {p k l i E}
+  → p ⊩ E ⇑ l
+  → k # p
+  → (k ≡ l → 𝟘)
+  → (p ⌢ k ↝ i) ⊩ E ⇑ l
+⇑-mono = ⇒-raise-mono

@@ -44,10 +44,22 @@ mutual
   per-mono k#p nat = nat
 
   -- Typehood is monotone
-  type-mono : ∀ {p A} k i → k # p → p ⊩ A type → (p ⌢ k ↝ i) ⊩ A type
-  type-mono k i k#p (now A₀ ⇓A₀ D) = now A₀ (⇓-mono ⇓A₀ k#p) (per-mono k#p D)
+  type-mono
+    : ∀ {p A} k i
+    → k # p
+    → p ⊩ A type
+    → (p ⌢ k ↝ i) ⊩ A type
+
+  type-mono k i k#p (now A₀ ⇓A₀ D) =
+    now A₀ (⇓-mono ⇓A₀ k#p) (per-mono k#p D)
+
   type-mono k i k#p (later k′ D E) with k Nat.≟ k′
-  type-mono k i k#p (later k′ D E) | ⊕.inl k≠k′ = {!!}
+
+  type-mono {p = p} {A = A} k i k#p (later l D E) | ⊕.inl k≠l =
+    later l
+      (⇑-mono D k#p k≠l)
+      (λ j → type-mono l j {!!} {!!})
+
   type-mono k i k#p (later .k D E) | ⊕.inr refl = E i
 
   -- Members are objects that *locally* compute to equal values
